@@ -1,0 +1,2 @@
+.
+-DCATKIN_DEVEL_PREFIX=/home/g/workspace/dlo-slam_noted/devel -DCMAKE_INSTALL_PREFIX=/home/g/workspace/dlo-slam_noted/install -G Unix Makefiles

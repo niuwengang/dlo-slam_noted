@@ -1,0 +1,8 @@
+prefix=/home/g/workspace/dlo-slam_noted/install
+
+Name: direct_lidar_odometry
+Description: Description of direct_lidar_odometry
+Version: 1.4.3
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib -ldirect_lidar_odometry -lnano_gicp -lnanoflann
+Requires: roscpp std_msgs sensor_msgs geometry_msgs pcl_ros
