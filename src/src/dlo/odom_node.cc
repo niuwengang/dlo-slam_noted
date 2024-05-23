@@ -9,26 +9,26 @@
 
 #include "dlo/odom.h"
 
-void controlC(int sig) {
+void controlC(int sig)
+{
 
-  dlo::OdomNode::abort();
-
+    dlo::OdomNode::abort();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
 
-  ros::init(argc, argv, "dlo_odom_node");
-  ros::NodeHandle nh("~");
+    ros::init(argc, argv, "dlo_odom_node");
+    ros::NodeHandle nh("~");
 
-  signal(SIGTERM, controlC);
-  sleep(0.5);
+    signal(SIGTERM, controlC); // 信号中断
+    sleep(0.5);                // 200hz
 
-  dlo::OdomNode node(nh);
-  ros::AsyncSpinner spinner(0);
-  spinner.start();
-  node.start();
-  ros::waitForShutdown();
+    dlo::OdomNode node(nh);
+    ros::AsyncSpinner spinner(0);
+    spinner.start();
+    node.start();
+    ros::waitForShutdown();
 
-  return 0;
-
+    return 0;
 }
