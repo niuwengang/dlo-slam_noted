@@ -234,7 +234,7 @@ class dlo::OdomNode
     int imu_calib_time_;
     int imu_buffer_size_;
 
-    int gicp_min_num_points_;
+    int gicp_min_num_points_; // 用于配准的最小点云数量
 
     int gicps2s_k_correspondences_;
     double gicps2s_max_corr_dist_;

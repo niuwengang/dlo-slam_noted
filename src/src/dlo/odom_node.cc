@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     signal(SIGTERM, controlC); // 信号中断
     sleep(0.5);                // 200hz
 
-    dlo::OdomNode node(nh);
+    dlo::OdomNode node(nh); // 有参构造
     ros::AsyncSpinner spinner(0);
     spinner.start();
     node.start(); // 主线程只打印一次信息

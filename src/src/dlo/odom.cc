@@ -27,6 +27,7 @@ dlo::OdomNode::OdomNode(ros::NodeHandle node_handle) : nh(node_handle)
     this->stop_metrics_thread = false;
     this->stop_debug_thread = false;
 
+    /*初始化标志位和在线标定标志位*/
     this->dlo_initialized = false;
     this->imu_calibrated = false;
 
@@ -455,6 +456,7 @@ void dlo::OdomNode::publishKeyframe()
 
 /**
  * Preprocessing
+ * 选取ROI区域，ROI区域滤波
  **/
 
 void dlo::OdomNode::preprocessPoints()
@@ -548,6 +550,7 @@ void dlo::OdomNode::setInputSources()
 
 /**
  * Gravity Alignment
+ *
  **/
 
 void dlo::OdomNode::gravityAlign()
@@ -661,10 +664,11 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr &pc)
 {
 
     double then = ros::Time::now().toSec();
-    this->scan_stamp = pc->header.stamp;
-    this->curr_frame_stamp = pc->header.stamp.toSec();
+    this->scan_stamp = pc->header.stamp;               // ros时间
+    this->curr_frame_stamp = pc->header.stamp.toSec(); // 秒
 
     // If there are too few points in the pointcloud, try again
+    /*点云点数过少 报警告*/
     this->current_scan = pcl::PointCloud<PointType>::Ptr(new pcl::PointCloud<PointType>);
     pcl::fromROSMsg(*pc, *this->current_scan);
     if (this->current_scan->points.size() < this->gicp_min_num_points_)
@@ -674,6 +678,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr &pc)
     }
 
     // DLO Initialization procedures (IMU calib, gravity align)
+    /*DLO初始化*/
     if (!this->dlo_initialized)
     {
         this->initializeDLO();
@@ -684,6 +689,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr &pc)
     this->preprocessPoints();
 
     // Compute Metrics
+    // 计算自适应参数
     this->metrics_thread = std::thread(&dlo::OdomNode::computeMetrics, this);
     this->metrics_thread.detach();
 
