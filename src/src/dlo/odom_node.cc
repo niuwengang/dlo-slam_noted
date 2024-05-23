@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     dlo::OdomNode node(nh);
     ros::AsyncSpinner spinner(0);
     spinner.start();
-    node.start();
+    node.start(); // 主线程只打印一次信息
     ros::waitForShutdown();
 
     return 0;

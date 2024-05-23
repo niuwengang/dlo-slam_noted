@@ -18,8 +18,10 @@ std::atomic<bool> dlo::OdomNode::abort_(false);
 dlo::OdomNode::OdomNode(ros::NodeHandle node_handle) : nh(node_handle)
 {
 
-    this->getParams(); // 获取参数
+    /*ros param获取参数*/
+    this->getParams();
 
+    /*线程相关的标志位*/
     this->stop_publish_thread = false;
     this->stop_publish_keyframe_thread = false;
     this->stop_metrics_thread = false;
@@ -686,6 +688,7 @@ void dlo::OdomNode::icpCB(const sensor_msgs::PointCloud2ConstPtr &pc)
     this->metrics_thread.detach();
 
     // Set Adaptive Parameters
+    /*自适应参数*/
     if (this->adaptive_params_use_)
     {
         this->setAdaptiveParams();
@@ -841,7 +844,7 @@ void dlo::OdomNode::getNextPose()
     if (this->imu_use_)
     {
         this->integrateIMU();
-        this->gicp_s2s.align(*aligned, this->imu_SE3);
+        this->gicp_s2s.align(*aligned, this->imu_SE3); // scan-to-scan
     }
     else
     {
@@ -904,6 +907,7 @@ void dlo::OdomNode::integrateIMU()
     // Extract IMU data between the two frames
     std::vector<ImuMeas> imu_frame;
 
+    /*检查下时间戳，防止错乱*/
     for (const auto &i : this->imu_buffer)
     {
 
@@ -919,8 +923,6 @@ void dlo::OdomNode::integrateIMU()
             imu_frame.push_back(i);
         }
     }
-
-    // Sort measurements by time
     std::sort(imu_frame.begin(), imu_frame.end(), this->comparatorImu);
 
     // Relative IMU integration of gyro and accelerometer
@@ -960,7 +962,8 @@ void dlo::OdomNode::integrateIMU()
                  dt;
     }
 
-    // Normalize quaternion
+    // 四元数归一化
+    //  Normalize quaternion
     double norm = sqrt(q.w() * q.w() + q.x() * q.x() + q.y() * q.y() + q.z() * q.z());
     q.w() /= norm;
     q.x() /= norm;
@@ -969,7 +972,7 @@ void dlo::OdomNode::integrateIMU()
 
     // Store IMU guess
     this->imu_SE3 = Eigen::Matrix4f::Identity();
-    this->imu_SE3.block(0, 0, 3, 3) = q.toRotationMatrix();
+    this->imu_SE3.block(0, 0, 3, 3) = q.toRotationMatrix(); // 只算旋转矩阵
 }
 
 /**
